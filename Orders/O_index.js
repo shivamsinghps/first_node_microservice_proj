@@ -1,7 +1,8 @@
 const express =  require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const Order = require(__dirname+'/orders_model.js')
+const Order = require(__dirname+'/orders_model.js');
+const axios = require('axios');
 
 const app = express();
 
@@ -27,6 +28,30 @@ app.post("/",(req,res)=>{
   });
 
 });
+
+app.get("/orders",(req,res) => {
+  Order.find().then((orders)=>{
+    orders.forEach((order)=>{
+      if(order){
+
+      axios.get("http://localhost:4550/user/"+order.userid).then((response)=>{
+        var username = response.data.name;
+      axios.get("http://localhost:4555/book/"+order.bookid).then((response)=>{
+        var booktitle = response.data.title;
+
+      console.log("This Order user is "+username+"and the book title is "+booktitle);
+      })
+    });
+  }else{
+    console.log("Order Does not exists");
+  }
+});
+res.send("u have it");
+});
+});
+
+
+
 
 app.listen(4500,() => {
   console.log('Orders Service is Online');
